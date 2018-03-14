@@ -164,7 +164,17 @@ public abstract class Critter {
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
 		List<Critter> result = new java.util.ArrayList<Critter>();
-	
+		try {
+		    Class c = Class.forName(critter_class_name);
+		    Critter critter1 = (Critter) c.newInstance();
+		    for(Critter critter2 : population) {
+		        if(critter2.getClass().equals(critter1.getClass())) {               // Does this use a subclass?
+		            result.add(critter2);
+                }
+            }
+        } catch(Exception e) {
+		    throw new InvalidCritterException(critter_class_name);
+        }
 		return result;
 	}
 	
@@ -207,6 +217,7 @@ public abstract class Critter {
 			super.energy = new_energy_value;
 			if(new_energy_value < 1) {                              // Is this ok?
 			    myWorld[getX_coord()][getY_coord()].remove(this);
+			    population.remove(this);
             }
 		}
 		
@@ -214,6 +225,7 @@ public abstract class Critter {
 			super.x_coord = new_x_coord;
 			if(getY_coord() != -1) {                                // Is this ok?
 			    myWorld[getX_coord()][getY_coord()].add(this);
+			    population.add(this);
             }
 		}
 		
@@ -221,6 +233,7 @@ public abstract class Critter {
 			super.y_coord = new_y_coord;
             if(getX_coord() != -1) {                                // Is this ok?
                 myWorld[getX_coord()][getY_coord()].add(this);
+                population.add(this);
             }
 		}
 		
@@ -263,6 +276,11 @@ public abstract class Critter {
 	}
 	
 	public static void worldTimeStep() {
+	    for(Critter c : babies) {
+	        myWorld[c.x_coord][c.y_coord].add(c);
+	        population.add(c);
+	        babies.remove(c);
+        }
 	    for(Critter c : population) {
 	        c.doTimeStep();
         }
@@ -289,6 +307,13 @@ public abstract class Critter {
 	        newAlgae.setY_coord(getRandomInt(Params.world_height));
 	        newAlgae.setEnergy(Params.start_energy);
 	        babies.add(newAlgae);
+        }
+        for(Critter c : population) {
+	        c.energy -= Params.rest_energy_cost;
+	        if(c.energy < 1) {
+	            myWorld[c.x_coord][c.y_coord].remove(c);
+	            population.remove(c);
+            }
         }
     }
 	
