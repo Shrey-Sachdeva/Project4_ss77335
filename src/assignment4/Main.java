@@ -14,6 +14,10 @@ package assignment4;
 
 import java.util.ArrayList;
 import java.util.Scanner;
+
+import deliver.InvalidVehicleException;
+import deliver.Vehicle;
+
 import java.io.*;
 
 
@@ -30,7 +34,8 @@ public class Main {
     private static String myPackage;	// package of Critter file.  Critter cannot be in default pkg.
     private static boolean DEBUG = false; // Use it or not, as you wish!
     static PrintStream old = System.out;	// if you want to restore output to console
-
+    
+    
 
     // Gets the package name.  The usage assumes that Critter and its subclasses are all in the same package.
     static {
@@ -43,6 +48,7 @@ public class Main {
      * and the second is test (for test output, where all output to be directed to a String), or nothing.
      */
     public static void main(String[] args) { 
+    	System.out.println("This is Critters!");
         if (args.length != 0) {
             try {
                 inputFile = args[0];
@@ -72,22 +78,171 @@ public class Main {
         /* Write your code below. */
 
         // TODO FIX INPUT
-        ArrayList<String> input = parse(kb);
-        while(!input.contains("quit"))
+        //ArrayList<String> input = "";
+        Command command;
+        while((command = getCommand(kb)).getCommandType() != Command.CommandType.QUIT) {
+        	//Main loop, use info from command variable to decide what to do
+        	switch(command.getCommandType()) {
+        	case STEP:
+        		System.out.println("ya you got a step" + command);
+        		break;
+        	default:
+        		System.out.println(command);
+        	}
+        	
+        }
 
         /* Write your code above */
         System.out.flush();
 
     }
 
+    /*
+     * private static enum Command {
+    	QUIT, SHOW, STEP, SEED, MAKE, STATS
+    }
+     */
+    private static Command getCommand(Scanner kb) {
+    	ArrayList<String> input = parse(kb);
+    	System.out.println("Input: " + input);
+    	Command retCommand = new Command(Command.CommandType.ERROR);
+    	if(input.size() == 0) {
+    		return retCommand;
+    	}
+    	String commandString = input.get(0);
+    	if(commandString.equals("quit")){
+    		if(input.size() == 1) {
+    			retCommand = new Command(Command.CommandType.QUIT);
+    		}else {
+    			System.out.println("error processing: " + unParse(input));
+    		}
+    		return retCommand;
+    	}else if(commandString.equals("show")){
+    		if(input.size() == 1) {
+    			retCommand = new Command(Command.CommandType.SHOW);
+    		}else {
+    			System.out.println("error processing: " + unParse(input));
+    		}
+    		return retCommand;
+    	}else if(commandString.equals("step")){ // [count]
+    		//First check if there is a count.
+    		if(input.size() == 2) {
+    			//There is a count
+    			int count = getNumberFromString(input.get(1));
+    			if(count <= 0) {
+    				System.out.println("error processing: " + unParse(input));
+    				return retCommand;
+    			}
+    			retCommand = new Command(Command.CommandType.STEP, count);
+    			return retCommand;
+    		}else if(input.size() == 1) {
+    			retCommand = new Command(Command.CommandType.STEP);
+    			return retCommand;
+    		}
+    	}else if(commandString.equals("seed")){ // number
+    		if(input.size() == 2) {
+    			int number = getNumberFromString(input.get(1));
+    			if(number == -1) {
+    				System.out.println("error processing: " + unParse(input));
+    				return retCommand;
+    			}
+    			retCommand = new Command(Command.CommandType.SEED, number);
+    			return retCommand;
+    		}
+    	}else if(commandString.equals("make")) { //class name, [count]
+    		if(input.size() == 3) {//class name and count present
+    			String className = "assignment4."+input.get(1);
+    			if(isValidClass(className)) {
+    				//The class is valid
+    				int count = getNumberFromString(input.get(2));
+    				if(count <= 0) {
+    					System.out.println("error processing: " + unParse(input));
+    					return retCommand;
+    				}
+    				retCommand = new Command(Command.CommandType.MAKE, className , count);
+    				return retCommand;
+    			}
+    		}else if(input.size() == 2) {// just class name present
+    			String className = "assignment4."+input.get(1);
+    			if(isValidClass(className)) {
+    				retCommand = new Command(Command.CommandType.MAKE, className);
+    				return retCommand;
+    			}else {
+    				System.out.println("error processing: " + unParse(input));
+    			}
+    		}
+    	}else if(commandString.equals("stats")) { // class name
+    		if(input.size() == 2) {
+    			String className = "assignment4."+input.get(1);
+    			if(isValidClass(className)) {
+    				retCommand = new Command(Command.CommandType.STATS, className);
+    				return retCommand;
+    			}else {
+    				System.out.println("error processing: " + unParse(input));
+    			}
+    		}
+    	}else {
+    		System.out.println("error processing: " + unParse(input));
+    	}
+    	return retCommand;
+    }
+    
+    /**
+     * Reads a line of input from the user and returns an array list of strings of the input split by spaces
+     * @param kb
+     * @return ArrayList<String>, ex: ["step", "20"]  or ["make", "Craig", "50"]
+     */
     private static ArrayList<String> parse(Scanner kb) {
-        ArrayList<String> input = new ArrayList<>();
-        kb.useDelimiter("\\n");
+        ArrayList<String> input = new ArrayList<String>();
+        kb.useDelimiter("\n");
         String next = kb.next();
-        while(kb.hasNext()) {
-            input.add(next);
-            next = kb.next();
+        String[] args = next.split(" ");
+        for(String arg : args) {
+        	input.add(arg.trim());
         }
         return input;
+    }
+    
+    /**
+     * Convert an arraylist back into the original string format
+     * @param input ex: ["step", "craig"]
+     * @return ex: "step craig"
+     */
+    private static String unParse(ArrayList<String> input) {
+    	String ret = "";
+    	for(String in : input) {
+    		ret = ret +in + " ";
+    	}
+    	return ret;
+    }
+    
+    /**
+     * Checks to see if a class name is a valid class
+     * @param className
+     * @return true if the class name is valid
+     */
+    private static boolean isValidClass(String className) {
+    	Class c;
+		try {
+			c = Class.forName(className);
+		} catch (ClassNotFoundException e) {
+			return false;
+		}
+		return true;
+    }
+    
+    /**
+     * Gets a number from the string or returns -1 if it is invalid.
+     * @param numberString ex: "20" or invalid: "craig"
+     * @return -1 if invalid, number if valid
+     */
+    private static int getNumberFromString(String numberString) {
+    	int number = -1;
+    	try {
+			number = Integer.parseInt(numberString);
+		}catch(NumberFormatException e) {
+			return -1;
+		}   	
+    	return number;
     }
 }
