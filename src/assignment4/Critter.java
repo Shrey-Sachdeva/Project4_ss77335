@@ -30,7 +30,7 @@ public abstract class Critter {
 
 	//private static ArrayList<Critter> critters = new ArrayList<>();
 	private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
-
+	private static boolean initializationFlag = false;
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -199,7 +199,7 @@ public abstract class Critter {
 			System.out.print(prefix + s + ":" + critter_count.get(s));
 			prefix = ", ";
 		}
-		System.out.println();		
+		System.out.println();
 	}
 	
 	/* the TestCritter class allows some critters to "cheat". If you want to 
@@ -279,8 +279,12 @@ public abstract class Critter {
 	    for(Critter c : babies) {
 	        myWorld[c.x_coord][c.y_coord].add(c);
 	        population.add(c);
-	        babies.remove(c);
+	        /**	TODO Concurrent modification!! cannot remove from babies while looping through it in this way!**/
+	        //babies.remove(c);
         }
+	    while(babies.size() > 0) {//Fixes concurrent modification
+	    	babies.remove(0);
+	    }
 	    for(Critter c : population) {
 	        c.doTimeStep();
         }
@@ -308,12 +312,17 @@ public abstract class Critter {
 	        newAlgae.setEnergy(Params.start_energy);
 	        babies.add(newAlgae);
         }
+        ArrayList<Critter> toRemove = new ArrayList<Critter>();
         for(Critter c : population) {
 	        c.energy -= Params.rest_energy_cost;
 	        if(c.energy < 1) {
 	            myWorld[c.x_coord][c.y_coord].remove(c);
-	            population.remove(c);
+	            //population.remove(c);//CONCURRENT EXCEPTION /** TODO CONCURRENT MODIFICATION **/
+	            toRemove.add(c);
             }
+        }
+        for(Critter c : toRemove) {//Fix concurrent modification exception
+        	population.remove(c);
         }
     }
 	
@@ -341,10 +350,25 @@ public abstract class Critter {
     }
     
 	public static void displayWorld() {
+		if(initializationFlag == false) {
+			for(int i = 0; i < Params.world_height; i++) {
+				for(int j = 0; j < Params.world_width; j++) {
+					myWorld[j][i] = new ArrayList<Critter>();
+				}
+			}
+			initializationFlag = true;
+			return;
+		}
 	    printBounds();
+	    boolean firstPole = true;
 	    for(int i = 0; i < Params.world_height; i++) {
-	        System.out.print("|");
-	        for(int j = 0; j < Params.world_width; j++) {
+	        if(!firstPole) {
+	        	System.out.print("|");
+	        }else {
+	        	firstPole = false;
+	        }
+	        
+	    	for(int j = 0; j < Params.world_width; j++) {
 	            if(myWorld[j][i].size() == 0) {
 	                System.out.print(' ');
                 }
@@ -352,9 +376,10 @@ public abstract class Critter {
 	                System.out.print(myWorld[j][i].get(0).toString());
                 }
             }
-            System.out.print("|");
+            System.out.print("|\n");
         }
         printBounds();
+        System.out.println("");//add new line
 	}
 
 	private static void printBounds() {
@@ -362,6 +387,7 @@ public abstract class Critter {
         for(int i = 0; i < Params.world_width; i++) {
             System.out.print('-');
         }
-        System.out.print('+');
+        System.out.print("+");
+        
     }
 }

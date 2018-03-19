@@ -79,15 +79,47 @@ public class Main {
 
         // TODO FIX INPUT
         //ArrayList<String> input = "";
+        Critter.displayWorld();//The first call to display world initializes the myWorld arraylist[][]
         Command command;
-        while((command = getCommand(kb)).getCommandType() != Command.CommandType.QUIT) {
+        while( (command = getCommand(kb)).getCommandType() != Command.CommandType.QUIT) {
         	//Main loop, use info from command variable to decide what to do
         	switch(command.getCommandType()) {
-        	case STEP:
-        		System.out.println("ya you got a step" + command);
+        	case SHOW:
+        		Critter.displayWorld();
         		break;
-        	default:
-        		System.out.println(command);
+        	case STEP:
+        		int steps = command.getCount();
+        		if(steps > 0) {//If there is a number of steps specified (steps != -1) then do that number
+        			while(steps > 0) {
+        				Critter.worldTimeStep();
+        				steps--;
+        			}
+        		}else {//If there is not a specified amount, just do 1 time step
+        			Critter.worldTimeStep();
+        		}
+        		break;
+        	case SEED:
+        		Critter.setSeed(command.getNumber());
+        		break;
+        	case MAKE:
+        		try {
+        			int number = command.getCount();
+        			if(number > 0) {//if there is a specified number of critters to make
+        				while(number > 0) {//make that number of critters
+        					Critter.makeCritter(command.getClassName());
+        					number--;
+        				}
+        			}else {
+        				Critter.makeCritter(command.getClassName());
+        			}
+				} catch (InvalidCritterException e) {
+					System.out.println("Invalid critter exception from input " + command.getClassName());
+				}
+        		break;
+        	case STATS:
+        		//Get instances
+        		//Then runStats for the different classes?
+        		break;
         	}
         	
         }
