@@ -27,7 +27,7 @@ public abstract class Critter {
 	private static String myPackage;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-
+	protected boolean hasMovedDuringTimeStep = false;
 	//private static ArrayList<Critter> critters = new ArrayList<>();
 	private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
 	private static boolean initializationFlag = false;
@@ -56,6 +56,8 @@ public abstract class Critter {
 	private int y_coord = -1;
 	
 	protected final void walk(int direction) {
+		
+		
 	    myWorld[x_coord][y_coord].remove(this);
 	    x_coord += xMovement(direction);
         y_coord += yMovement(direction);
@@ -66,6 +68,7 @@ public abstract class Critter {
         y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
         myWorld[x_coord][y_coord].add(this);
         energy -= Params.walk_energy_cost;
+        
 	}
 	
 	protected final void run(int direction) {
@@ -151,7 +154,7 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
-		List<Critter> result = new java.util.ArrayList<Critter>();
+		List<Critter> result = new ArrayList<Critter>();
 		try {
 		    Class c = Class.forName(critter_class_name);
 		    Critter critter1 = (Critter) c.newInstance();
@@ -269,7 +272,7 @@ public abstract class Critter {
 	
 	public static void worldTimeStep() {
 	    for(Critter c : babies) {
-	    	System.out.println("("+c.x_coord + ", " + c.y_coord + ") in world of " + myWorld.length + " by " + myWorld[0].length + " TYPE: " + c.getClass().getName());
+	    	//System.out.println("("+c.x_coord + ", " + c.y_coord + ") in world of " + myWorld.length + " by " + myWorld[0].length + " TYPE: " + c.getClass().getName());
 	        myWorld[c.x_coord][c.y_coord].add(c);
 	        population.add(c);
         }
@@ -295,11 +298,13 @@ public abstract class Critter {
             }
         }
         for(int i = 0; i < Params.refresh_algae_count; i++) {
-	        Algae newAlgae = new Algae();
-	        newAlgae.setX_coord(getRandomInt(Params.world_width));
-	        newAlgae.setY_coord(getRandomInt(Params.world_height));
-	        newAlgae.setEnergy(Params.start_energy);
-	        babies.add(newAlgae);
+	        
+        	try {
+				makeCritter("assignment4.Algae");
+			} catch (InvalidCritterException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         }
         ArrayList<Critter> toRemove = new ArrayList<Critter>();
         for(Critter c : population) {
@@ -339,7 +344,7 @@ public abstract class Critter {
     }
     
 	public static void displayWorld() {
-		System.out.println("Displaying world");
+		//System.out.println("Displaying world");
 		//Initialize the world on the first call of displayWorld
 		if(initializationFlag == false) {
 			for(int i = 0; i < Params.world_height; i++) {

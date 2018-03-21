@@ -13,12 +13,15 @@ package assignment4;
  */
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 import deliver.InvalidVehicleException;
 import deliver.Vehicle;
 
 import java.io.*;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 
 /*
@@ -119,8 +122,27 @@ public class Main {
         	case STATS:
         		//Get instances
         		//Then runStats for the different classes?
+        		try {
+        			List<Critter> critterList = Critter.getInstances(command.getClassName());
+        			Method forName;
+					try {
+						forName = Class.forName(command.getClassName()).getMethod("runStats", critterList.getClass() );
+						forName.invoke(critterList);
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+        			
+				} catch (InvalidCritterException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+        		
         		break;
+        	
         	}
+        	
         	
         }
 
@@ -136,7 +158,7 @@ public class Main {
      */
     private static Command getCommand(Scanner kb) {
     	ArrayList<String> input = parse(kb);
-    	System.out.println("Input: " + input);
+    	
     	Command retCommand = new Command(Command.CommandType.ERROR);
     	if(input.size() == 0) {
     		return retCommand;
@@ -171,6 +193,10 @@ public class Main {
     			retCommand = new Command(Command.CommandType.STEP);
     			return retCommand;
     		}
+    		else {
+    			System.out.println("error processing: " + unParse(input));
+				return retCommand;
+    		}
     	}else if(commandString.equals("seed")){ // number
     		if(input.size() == 2) {
     			int number = getNumberFromString(input.get(1));
@@ -192,6 +218,10 @@ public class Main {
     					return retCommand;
     				}
     				retCommand = new Command(Command.CommandType.MAKE, className , count);
+    				return retCommand;
+    			}
+    			else {
+    				System.out.println("error processing: " + unParse(input));
     				return retCommand;
     			}
     		}else if(input.size() == 2) {// just class name present

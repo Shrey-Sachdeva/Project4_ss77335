@@ -2,6 +2,8 @@ package assignment4;
 
 public class Critter1 extends Critter.TestCritter {
 
+	
+	
     @Override
     public String toString() {
         return "1";
