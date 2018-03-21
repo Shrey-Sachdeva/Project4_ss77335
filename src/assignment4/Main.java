@@ -48,7 +48,7 @@ public class Main {
      * and the second is test (for test output, where all output to be directed to a String), or nothing.
      */
     public static void main(String[] args) { 
-    	System.out.println("This is Critters!");
+    	System.out.println("This is Critters! " +10%10);
         if (args.length != 0) {
             try {
                 inputFile = args[0];
@@ -225,6 +225,7 @@ public class Main {
      * @return ArrayList<String>, ex: ["step", "20"]  or ["make", "Craig", "50"]
      */
     private static ArrayList<String> parse(Scanner kb) {
+    	System.out.println("Please input:");
         ArrayList<String> input = new ArrayList<String>();
         kb.useDelimiter("\n");
         String next = kb.next();

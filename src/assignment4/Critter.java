@@ -59,18 +59,11 @@ public abstract class Critter {
 	    myWorld[x_coord][y_coord].remove(this);
 	    x_coord += xMovement(direction);
         y_coord += yMovement(direction);
-        if(x_coord == Params.world_width) {
-            x_coord = 0;
-        }
-        else if(x_coord < 0) {
-            x_coord = Params.world_width - 1;
-        }
-	    if(y_coord == Params.world_height) {
-            y_coord = 0;
-        }
-        else if(y_coord < 0) {
-            y_coord = Params.world_height - 1;
-        }
+
+        x_coord %= Params.world_width;
+        y_coord %= Params.world_height;
+        x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
+        y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
         myWorld[x_coord][y_coord].add(this);
         energy -= Params.walk_energy_cost;
 	}
@@ -111,18 +104,13 @@ public abstract class Critter {
 	        energy -= offspring.energy;
 	        offspring.x_coord = x_coord + xMovement(direction);
 	        offspring.y_coord = y_coord + yMovement(direction);
-            if(x_coord == Params.world_width) {
-                x_coord = 0;
-            }
-            else if(x_coord < 0) {
-                x_coord = Params.world_width - 1;
-            }
-            if(y_coord == Params.world_height) {
-                y_coord = 0;
-            }
-            else if(y_coord < 0) {
-                y_coord = Params.world_height - 1;
-            }
+            
+	        offspring.x_coord %= Params.world_width;
+	        offspring.y_coord %= Params.world_height;
+            
+	        offspring.x_coord = offspring.x_coord < 0 ? Params.world_width + offspring.x_coord : offspring.x_coord;
+	        offspring.y_coord = offspring.y_coord < 0 ? Params.world_height + offspring.y_coord : offspring.y_coord;
+            
             babies.add(offspring);
         }
 	}
@@ -222,6 +210,8 @@ public abstract class Critter {
 		}
 		
 		protected void setX_coord(int new_x_coord) {
+			new_x_coord %= Params.world_width;
+			new_x_coord = new_x_coord < 0 ? Params.world_width + new_x_coord : new_x_coord;
 			super.x_coord = new_x_coord;
 			if(getY_coord() != -1) {                                // Is this ok?
 			    myWorld[getX_coord()][getY_coord()].add(this);
@@ -230,6 +220,8 @@ public abstract class Critter {
 		}
 		
 		protected void setY_coord(int new_y_coord) {
+			new_y_coord %= Params.world_height;
+			new_y_coord = new_y_coord < 0 ? Params.world_height + new_y_coord : new_y_coord;
 			super.y_coord = new_y_coord;
             if(getX_coord() != -1) {                                // Is this ok?
                 myWorld[getX_coord()][getY_coord()].add(this);
@@ -277,14 +269,11 @@ public abstract class Critter {
 	
 	public static void worldTimeStep() {
 	    for(Critter c : babies) {
+	    	System.out.println("("+c.x_coord + ", " + c.y_coord + ") in world of " + myWorld.length + " by " + myWorld[0].length + " TYPE: " + c.getClass().getName());
 	        myWorld[c.x_coord][c.y_coord].add(c);
 	        population.add(c);
-	        /**	TODO Concurrent modification!! cannot remove from babies while looping through it in this way!**/
-	        //babies.remove(c);
         }
-	    while(babies.size() > 0) {//Fixes concurrent modification
-	    	babies.remove(0);
-	    }
+	    babies.clear();
 	    for(Critter c : population) {
 	        c.doTimeStep();
         }
@@ -294,11 +283,11 @@ public abstract class Critter {
                     Critter critter1 = myWorld[i][j].get(0);
                     Critter critter2 = myWorld[i][j].get(1);
                     resolveEncounter(critter1, critter2);
-                    if (critter1.energy == 0) {
+                    if (critter1.energy <= 0) {
                         population.remove(critter1);
                         myWorld[critter1.x_coord][critter1.y_coord].remove(critter1);
                     }
-                    if (critter2.energy == 0) {
+                    if (critter2.energy <= 0) {
                         population.remove(critter2);
                         myWorld[critter2.x_coord][critter2.y_coord].remove(critter2);
                     }
@@ -342,7 +331,7 @@ public abstract class Critter {
 	            critter1.energy += (critter2.energy / 2);
 	            critter2.energy = 0;
             }
-            else if(critter1Rolls < critter2Rolls) {
+            else{
 	            critter2.energy += (critter1.energy / 2);
 	            critter1.energy = 0;
             }
@@ -350,6 +339,8 @@ public abstract class Critter {
     }
     
 	public static void displayWorld() {
+		System.out.println("Displaying world");
+		//Initialize the world on the first call of displayWorld
 		if(initializationFlag == false) {
 			for(int i = 0; i < Params.world_height; i++) {
 				for(int j = 0; j < Params.world_width; j++) {
@@ -360,13 +351,12 @@ public abstract class Critter {
 			return;
 		}
 	    printBounds();
+	    System.out.println("");
 	    boolean firstPole = true;
 	    for(int i = 0; i < Params.world_height; i++) {
-	        if(!firstPole) {
-	        	System.out.print("|");
-	        }else {
-	        	firstPole = false;
-	        }
+	        
+	        System.out.print("|");
+	        
 	        
 	    	for(int j = 0; j < Params.world_width; j++) {
 	            if(myWorld[j][i].size() == 0) {
