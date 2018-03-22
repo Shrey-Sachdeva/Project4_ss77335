@@ -24,10 +24,27 @@ public class Critter1 extends Critter {
        if(opponent.equals("@")) {// buffalo eat grass
            return true;
        }
-       else if (opponent.equals("1")){
+        else {
+           tryingToFlee = true;
            walk(4);//move back in the herd
            return false;
        }
-       return false;
     }
+    
+    public static void runStats(java.util.List<Critter> ones) {
+    	if(ones.size() == 0) {
+    		System.out.println("0 total Critter1s, how sad");
+    		return;
+    	}
+    	
+    	int averageEnergy  = 0;
+    	for(Object o : ones) {
+    		Critter1 one = (Critter1) o;
+    		averageEnergy += one.getEnergy();
+    	}
+    	averageEnergy /= ones.size();
+    	System.out.println(ones.size() + " total Critter1s running to the right with average energy: " + averageEnergy);
+    	
+    }
+    
 }

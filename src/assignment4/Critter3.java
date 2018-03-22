@@ -75,4 +75,35 @@ public class Critter3 extends Critter {
     public boolean fight(String opponent) {
         return true;
     }
+    
+    private int getBoxPerimeter() {
+    	return right + down + left + up;
+    }
+    
+    public static void runStats(java.util.List<Critter> threes) {
+    	
+    	if(threes.size() == 0) {
+    		System.out.println("0 total Critter3s");
+    		return;
+    	}
+    	int minimumBoxPerimeter = ((Critter3)threes.get(0)).getBoxPerimeter();
+    	int maximumBoxPerimeter = 0;
+    	int averageBoxPerimeter = 0;
+    	int averageEnergy = 0;
+    	
+    	for(Object t : threes) {
+    		Critter3 three = (Critter3) t;
+    		averageBoxPerimeter += three.getBoxPerimeter();
+    		if(three.getBoxPerimeter() < minimumBoxPerimeter) {
+    			minimumBoxPerimeter = three.getBoxPerimeter();
+    		}
+    		if(three.getBoxPerimeter() > maximumBoxPerimeter) {
+    			maximumBoxPerimeter = three.getBoxPerimeter();
+    		}
+    		averageEnergy += three.getEnergy();
+    	}
+    	averageBoxPerimeter /= threes.size();
+    	averageEnergy /= threes.size();
+    	System.out.println(threes.size() + " total Critter3s being territorial. Territory Perimeter stats:\tminimum: "+minimumBoxPerimeter+"\tmaximum: "+maximumBoxPerimeter + "\taverage: " +averageBoxPerimeter  + "\taverage energy: " + averageEnergy);
+    }
 }

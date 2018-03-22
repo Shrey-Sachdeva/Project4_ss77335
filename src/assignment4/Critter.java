@@ -30,6 +30,7 @@ public abstract class Critter {
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
 	private boolean hasMoved = false;
+	protected boolean tryingToFlee = false;
 	private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
 	private static boolean initializationFlag = false;
 
@@ -59,15 +60,31 @@ public abstract class Critter {
 	
 	protected final void walk(int direction) {
 		if(!hasMoved) {
-            myWorld[x_coord][y_coord].remove(this);
-            x_coord += xMovement(direction);
-            y_coord += yMovement(direction);
+            if(!tryingToFlee) {
+				myWorld[x_coord][y_coord].remove(this);
+				x_coord += xMovement(direction);
+				y_coord += yMovement(direction);
 
-            x_coord %= Params.world_width;
-            y_coord %= Params.world_height;
-            x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
-            y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
-            myWorld[x_coord][y_coord].add(this);
+				x_coord %= Params.world_width;
+				y_coord %= Params.world_height;
+				x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
+				y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
+				myWorld[x_coord][y_coord].add(this);
+			}
+			else {
+            	int newX = x_coord + xMovement(direction);
+            	int newY = y_coord + yMovement(direction);
+				newX %= Params.world_width;
+				newY %= Params.world_height;
+				newX = newX < 0 ? Params.world_width + newX : newX;
+				newY = newY < 0 ? Params.world_height + newY : newY;
+				if(myWorld[newX][newY].size() == 0) {
+					myWorld[x_coord][y_coord].remove(this);
+					myWorld[newX][newY].add(this);
+					x_coord = newX;
+					y_coord = newY;
+				}
+			}
         }
         energy -= Params.walk_energy_cost;
         hasMoved = true;
@@ -75,11 +92,28 @@ public abstract class Critter {
 	
 	protected final void run(int direction) {
 		if(!hasMoved) {
-            walk(direction);
-            hasMoved = false;
-            walk(direction);
+			if(!tryingToFlee) {
+				walk(direction);
+				hasMoved = false;
+				walk(direction);
+				energy += 2 * Params.walk_energy_cost;
+			}
+			else {
+				int newX = x_coord + 2 * xMovement(direction);
+				int newY = y_coord + 2 * yMovement(direction);
+				newX %= Params.world_width;
+				newY %= Params.world_height;
+				newX = newX < 0 ? Params.world_width + newX : newX;
+				newY = newY < 0 ? Params.world_height + newY : newY;
+				if(myWorld[newX][newY].size() == 0) {
+					myWorld[x_coord][y_coord].remove(this);
+					myWorld[newX][newY].add(this);
+					x_coord = newX;
+					y_coord = newY;
+				}
+			}
         }
-        energy = energy + 2 * Params.walk_energy_cost - Params.run_energy_cost;
+        energy -= Params.run_energy_cost;
     }
 
     private static int xMovement(int direction) {
@@ -305,6 +339,7 @@ public abstract class Critter {
                 toRemove.add(c);
             }
             c.hasMoved = false;
+            c.tryingToFlee = false;
         }
         for(Critter c : toRemove) {//Fix concurrent modification exception
             population.remove(c);
@@ -334,6 +369,7 @@ public abstract class Critter {
                 if (critter1.energy > 0 && critter2.energy > 0) {
                     int critter1Rolls = -1;
                     int critter2Rolls = -1;
+                    
                     if (critter1Fights) {
                         critter1Rolls = getRandomInt(critter1.energy);
                     }

@@ -121,10 +121,13 @@ public class Main {
         		//Then runStats for the different classes?
         		try {
         			List<Critter> critterList = Critter.getInstances(command.getClassName());
-        			Method forName;
+        			Method runStatsMethod;
 					try {
-						forName = Class.forName(command.getClassName()).getMethod("runStats", critterList.getClass() );
-						forName.invoke(critterList);
+						Class<Critter> newCritter = (Class<Critter>) Class.forName(command.getClassName());
+						runStatsMethod = newCritter.getMethod("runStats", List.class);
+						runStatsMethod.invoke(newCritter, critterList);
+						//forName = ((Class<Critter>)Class.forName(command.getClassName())).getMethod("runStats", (List<Critter>)critterList.getClass() );
+						//forName.invoke(critterList);
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
