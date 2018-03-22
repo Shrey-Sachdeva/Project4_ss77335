@@ -1,27 +1,33 @@
 package assignment4;
 
-public class Critter1 extends Critter.TestCritter {
+public class Critter1 extends Critter {
+    private int direction;
 
-	
-	
+    public Critter1() {
+        direction = 0;
+    }
+
     @Override
     public String toString() {
         return "1";
     }
-    
-    
 
     @Override
     public void doTimeStep() {
-        //run(getRandomInt(8));
-    	run(0);
+    	run(direction);
         Critter1 offspring = new Critter1();
         reproduce(offspring, getRandomInt(8));
     }
 
     @Override
-    // If this has more energy than its opponent, it will fight
     public boolean fight(String opponent) {
-       return true;
+       if(opponent.equals("@")) {// buffalo eat grass
+           return true;
+       }
+       else if (opponent.equals("1")){
+           walk(4);//move back in the herd
+           return false;
+       }
+       return false;
     }
 }

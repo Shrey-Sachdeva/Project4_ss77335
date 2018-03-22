@@ -16,9 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import deliver.InvalidVehicleException;
-import deliver.Vehicle;
-
 import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -51,7 +48,7 @@ public class Main {
      * and the second is test (for test output, where all output to be directed to a String), or nothing.
      */
     public static void main(String[] args) { 
-    	System.out.println("This is Critters! " +10%10);
+    	System.out.println("This is Critters!");
         if (args.length != 0) {
             try {
                 inputFile = args[0];

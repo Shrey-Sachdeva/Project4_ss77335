@@ -13,6 +13,8 @@ package assignment4;
  */
 
 
+import com.sun.xml.internal.bind.v2.TODO;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -27,10 +29,10 @@ public abstract class Critter {
 	private static String myPackage;
 	private	static List<Critter> population = new java.util.ArrayList<Critter>();
 	private static List<Critter> babies = new java.util.ArrayList<Critter>();
-	protected boolean hasMovedDuringTimeStep = false;
-	//private static ArrayList<Critter> critters = new ArrayList<>();
+	private boolean hasMoved = false;
 	private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
 	private static boolean initializationFlag = false;
+
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
 		myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -56,24 +58,27 @@ public abstract class Critter {
 	private int y_coord = -1;
 	
 	protected final void walk(int direction) {
-		
-		
-	    myWorld[x_coord][y_coord].remove(this);
-	    x_coord += xMovement(direction);
-        y_coord += yMovement(direction);
+		if(!hasMoved) {
+            myWorld[x_coord][y_coord].remove(this);
+            x_coord += xMovement(direction);
+            y_coord += yMovement(direction);
 
-        x_coord %= Params.world_width;
-        y_coord %= Params.world_height;
-        x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
-        y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
-        myWorld[x_coord][y_coord].add(this);
+            x_coord %= Params.world_width;
+            y_coord %= Params.world_height;
+            x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
+            y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
+            myWorld[x_coord][y_coord].add(this);
+        }
         energy -= Params.walk_energy_cost;
-        
+        hasMoved = true;
 	}
 	
 	protected final void run(int direction) {
-		walk(direction);
-		walk(direction);
+		if(!hasMoved) {
+            walk(direction);
+            hasMoved = false;
+            walk(direction);
+        }
         energy = energy + 2 * Params.walk_energy_cost - Params.run_energy_cost;
     }
 
@@ -91,10 +96,10 @@ public abstract class Critter {
 
     private static int yMovement(int direction) {
         if(direction == 1 || direction == 2 || direction == 3) {
-            return 1;
+            return -1;
         }
         else if(direction == 5 || direction == 6 || direction == 7) {
-            return -1;
+            return 1;
         }
         else {
             return 0;
@@ -141,7 +146,7 @@ public abstract class Critter {
             critter.y_coord = y;
             critter.energy = Params.start_energy;
             population.add(critter);
-            myWorld[x][y].add(critter);
+            myWorld[x][y].add(0, critter);
         } catch(Exception e) {
             throw new InvalidCritterException(critter_class_name);
         }
@@ -271,12 +276,6 @@ public abstract class Critter {
 	}
 	
 	public static void worldTimeStep() {
-	    for(Critter c : babies) {
-	    	//System.out.println("("+c.x_coord + ", " + c.y_coord + ") in world of " + myWorld.length + " by " + myWorld[0].length + " TYPE: " + c.getClass().getName());
-	        myWorld[c.x_coord][c.y_coord].add(c);
-	        population.add(c);
-        }
-	    babies.clear();
 	    for(Critter c : population) {
 	        c.doTimeStep();
         }
@@ -297,8 +296,20 @@ public abstract class Critter {
                 }
             }
         }
+        ArrayList<Critter> toRemove = new ArrayList<Critter>();
+        for(Critter c : population) {
+            c.energy -= Params.rest_energy_cost;
+            if(c.energy < 1) {
+                myWorld[c.x_coord][c.y_coord].remove(c);
+                //population.remove(c);//CONCURRENT EXCEPTION /** TODO CONCURRENT MODIFICATION **/
+                toRemove.add(c);
+            }
+            c.hasMoved = false;
+        }
+        for(Critter c : toRemove) {//Fix concurrent modification exception
+            population.remove(c);
+        }
         for(int i = 0; i < Params.refresh_algae_count; i++) {
-	        
         	try {
 				makeCritter("assignment4.Algae");
 			} catch (InvalidCritterException e) {
@@ -306,39 +317,37 @@ public abstract class Critter {
 				e.printStackTrace();
 			}
         }
-        ArrayList<Critter> toRemove = new ArrayList<Critter>();
-        for(Critter c : population) {
-	        c.energy -= Params.rest_energy_cost;
-	        if(c.energy < 1) {
-	            myWorld[c.x_coord][c.y_coord].remove(c);
-	            //population.remove(c);//CONCURRENT EXCEPTION /** TODO CONCURRENT MODIFICATION **/
-	            toRemove.add(c);
-            }
+        for(Critter c : babies) {
+            //System.out.println("("+c.x_coord + ", " + c.y_coord + ") in world of " + myWorld.length + " by " + myWorld[0].length + " TYPE: " + c.getClass().getName());
+            myWorld[c.x_coord][c.y_coord].add(c);
+            population.add(c);
         }
-        for(Critter c : toRemove) {//Fix concurrent modification exception
-        	population.remove(c);
-        }
+        babies.clear();
     }
-	
+
+    // FIX FOR FLEEING IN FIGHTS
     private static void resolveEncounter(Critter critter1, Critter critter2) {
 	    boolean critter1Fights = critter1.fight(critter2.toString());
-	    boolean critter2Fights = critter2.fight(critter1.toString());
-	    if(critter1.energy > 0 && critter2.energy > 0) {
-	        int critter1Rolls = 0;
-	        int critter2Rolls = 0;
-	        if(critter1Fights) {
-	            critter1Rolls = getRandomInt(critter1.energy);
-            }
-            if(critter2Fights) {
-	            critter2Rolls = getRandomInt(critter2.energy);
-            }
-            if(critter1Rolls >= critter2Rolls) {                    // =?
-	            critter1.energy += (critter2.energy / 2);
-	            critter2.energy = 0;
-            }
-            else{
-	            critter2.energy += (critter1.energy / 2);
-	            critter1.energy = 0;
+	    if(myWorld[critter1.x_coord][critter1.y_coord].contains(critter2)) {
+            boolean critter2Fights = critter2.fight(critter1.toString());
+            if(critter1.x_coord == critter2.x_coord && critter1.y_coord == critter2.y_coord) {
+                if (critter1.energy > 0 && critter2.energy > 0) {
+                    int critter1Rolls = -1;
+                    int critter2Rolls = -1;
+                    if (critter1Fights) {
+                        critter1Rolls = getRandomInt(critter1.energy);
+                    }
+                    if (critter2Fights) {
+                        critter2Rolls = getRandomInt(critter2.energy);
+                    }
+                    if (critter1Rolls >= critter2Rolls) {
+                        critter1.energy += (critter2.energy / 2);
+                        critter2.energy = 0;
+                    } else {
+                        critter2.energy += (critter1.energy / 2);
+                        critter1.energy = 0;
+                    }
+                }
             }
         }
     }
