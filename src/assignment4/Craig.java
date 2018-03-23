@@ -71,13 +71,11 @@ public class Craig extends Critter {
 			total_left += c.genes[5] + c.genes[6] + c.genes[7];
 			averageEnergy += c.getEnergy();
 		}
-		averageEnergy /= craigs.size();
 		System.out.print("" + craigs.size() + " total Craigs    ");
 		System.out.print("" + total_straight / (GENE_TOTAL * 0.01 * craigs.size()) + "% straight   ");
 		System.out.print("" + total_back / (GENE_TOTAL * 0.01 * craigs.size()) + "% back   ");
 		System.out.print("" + total_right / (GENE_TOTAL * 0.01 * craigs.size()) + "% right   ");
 		System.out.print("" + total_left / (GENE_TOTAL * 0.01 * craigs.size()) + "% left   ");
-		System.out.print("" + "\taverage energy: " + averageEnergy);
 		System.out.println();
 	}
 }

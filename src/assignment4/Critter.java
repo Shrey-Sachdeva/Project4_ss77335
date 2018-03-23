@@ -30,7 +30,6 @@ public abstract class Critter {
 	protected boolean tryingToFlee = false;
 	// 2D array representing Critter locations
 	private static ArrayList<Critter>[][] myWorld = new ArrayList[Params.world_width][Params.world_height];
-	private static boolean initializationFlag = false;
 
 	// Gets the package name.  This assumes that Critter and its subclasses are all in the same package.
 	static {
@@ -86,6 +85,9 @@ public abstract class Critter {
 				y_coord %= Params.world_height;
 				x_coord = x_coord < 0 ? Params.world_width + x_coord : x_coord;
 				y_coord = y_coord < 0 ? Params.world_height + y_coord : y_coord;
+				if(myWorld[x_coord][y_coord] == null){
+				    myWorld[x_coord][y_coord] = new ArrayList<Critter>();
+                }
 				myWorld[x_coord][y_coord].add(this);
 			}
 			else {
@@ -130,6 +132,9 @@ public abstract class Critter {
 				newY %= Params.world_height;
 				newX = newX < 0 ? Params.world_width + newX : newX;
 				newY = newY < 0 ? Params.world_height + newY : newY;
+				if(myWorld[newX][newY] == null){
+				    myWorld[newX][newY] = new ArrayList<>();
+                }
 				if(myWorld[newX][newY].size() == 0) {
 					myWorld[x_coord][y_coord].remove(this);
 					myWorld[newX][newY].add(this);
@@ -210,7 +215,10 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static void makeCritter(String critter_class_name) throws InvalidCritterException {
-        try {
+        if(!critter_class_name.contains("assignment4.")){
+            critter_class_name = "assignment4."+critter_class_name;
+        }
+	    try {
             Class c = Class.forName(critter_class_name);
             Critter critter = (Critter) c.newInstance();
             int x = getRandomInt(Params.world_width);
@@ -219,6 +227,9 @@ public abstract class Critter {
             critter.y_coord = y;
             critter.energy = Params.start_energy;
             population.add(critter);
+            if(myWorld[x][y] == null){
+                myWorld[x][y] = new ArrayList<Critter>();
+            }
             myWorld[x][y].add(0, critter);
         } catch(Exception e) {
             throw new InvalidCritterException(critter_class_name);
@@ -232,7 +243,10 @@ public abstract class Critter {
 	 * @throws InvalidCritterException
 	 */
 	public static List<Critter> getInstances(String critter_class_name) throws InvalidCritterException {
-		List<Critter> result = new ArrayList<Critter>();
+		if(!critter_class_name.contains("assignment4.")){
+		    critter_class_name = "assignment4." + critter_class_name;
+        }
+	    List<Critter> result = new ArrayList<Critter>();
 		try {
 		    Class c = Class.forName(critter_class_name);
 		    Critter critter1 = (Critter) c.newInstance();
@@ -304,6 +318,9 @@ public abstract class Critter {
 			super.x_coord = new_x_coord;
 			// Adds the critter to the general population if its x_coord and y_coord have been set
 			if(getY_coord() != -1) {
+			    if(myWorld[getX_coord()][getY_coord()] == null){
+                    myWorld[getX_coord()][getY_coord()] = new ArrayList<>();
+                }
 			    myWorld[getX_coord()][getY_coord()].add(this);
 			    population.add(this);
             }
@@ -319,6 +336,9 @@ public abstract class Critter {
 			super.y_coord = new_y_coord;
             // Adds the critter to the general population if its x_coord and y_coord have been set
             if(getX_coord() != -1) {
+                if(myWorld[getX_coord()][getY_coord()] == null){
+                    myWorld[getX_coord()][getY_coord()] = new ArrayList<>();
+                }
                 myWorld[getX_coord()][getY_coord()].add(this);
                 population.add(this);
             }
@@ -380,6 +400,9 @@ public abstract class Critter {
         // Determine locations where multiple Critters occupy the same position
         for(int i = 0; i < Params.world_width; i++) {
 	        for(int j = 0; j < Params.world_height; j++) {
+	            if(myWorld[i][j] == null){
+	                myWorld[i][j] = new ArrayList<Critter>();
+                }
                 while (myWorld[i][j].size() > 1) {
                     Critter critter1 = myWorld[i][j].get(0);
                     Critter critter2 = myWorld[i][j].get(1);
@@ -470,22 +493,15 @@ public abstract class Critter {
      * Display world in response to command "show"
      */
     public static void displayWorld() {
-		//Initialize the world on the first call of displayWorld
-		if(initializationFlag == false) {
-			for(int i = 0; i < Params.world_height; i++) {
-				for(int j = 0; j < Params.world_width; j++) {
-					myWorld[j][i] = new ArrayList<Critter>();
-				}
-			}
-			initializationFlag = true;
-			return;
-		}
 		// Display world
 	    printBounds();
 	    System.out.println("");
 	    for(int i = 0; i < Params.world_height; i++) {
 	        System.out.print("|");
 	    	for(int j = 0; j < Params.world_width; j++) {
+	    	    if(myWorld[j][i] == null){
+	    	        myWorld[j][i] = new ArrayList<Critter>();
+                }
 	            if(myWorld[j][i].size() == 0) {
 	                System.out.print(' ');
                 }

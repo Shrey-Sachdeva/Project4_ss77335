@@ -70,7 +70,6 @@ public class Main {
 
         /* Do not alter the code above for your submission. */
         /* Write your code below. */
-        Critter.displayWorld();//The first call to display world initializes the myWorld arraylist[][]
         Command command;
         while( (command = getCommand(kb)).getCommandType() != Command.CommandType.QUIT) {
         	//Main loop, use info from command variable to decide what to do
@@ -151,14 +150,14 @@ public class Main {
     		if(input.size() == 1) {
     			retCommand = new Command(Command.CommandType.QUIT);
     		}else {
-    			System.out.println("invalid command: " + unParse(input));
+    			System.out.println("error processing: " + unParse(input));
     		}
     		return retCommand;
     	}else if(commandString.equals("show")){
     		if(input.size() == 1) {
     			retCommand = new Command(Command.CommandType.SHOW);
     		}else {
-    			System.out.println("invalid command: " + unParse(input));
+    			System.out.println("error processing: " + unParse(input));
     		}
     		return retCommand;
     	}else if(commandString.equals("step")){ // [count]
@@ -177,7 +176,7 @@ public class Main {
     			return retCommand;
     		}
     		else {
-    			System.out.println("invalid command: " + unParse(input));
+    			System.out.println("error processing: " + unParse(input));
 				return retCommand;
     		}
     	}else if(commandString.equals("seed")){ // number
@@ -189,7 +188,10 @@ public class Main {
     			}
     			retCommand = new Command(Command.CommandType.SEED, number);
     			return retCommand;
-    		}
+    		}else{
+				System.out.println("error processing: " + unParse(input));
+				return retCommand;
+			}
     	}else if(commandString.equals("make")) { //class name, [count]
     		if(input.size() == 3) {//class name and count present
     			String className = "assignment4."+input.get(1);
@@ -204,7 +206,7 @@ public class Main {
     				return retCommand;
     			}
     			else {
-    				System.out.println("invalid command: " + unParse(input));
+    				System.out.println("error processing: " + unParse(input));
     				return retCommand;
     			}
     		}else if(input.size() == 2) {// just class name present
@@ -213,9 +215,12 @@ public class Main {
     				retCommand = new Command(Command.CommandType.MAKE, className);
     				return retCommand;
     			}else {
-    				System.out.println("invalid command: " + unParse(input));
+    				System.out.println("error processing: " + unParse(input));
     			}
-    		}
+    		}else{
+				System.out.println("error processing: " + unParse(input));
+				return retCommand;
+			}
     	}else if(commandString.equals("stats")) { // class name
     		if(input.size() == 2) {
     			String className = "assignment4."+input.get(1);
@@ -223,9 +228,12 @@ public class Main {
     				retCommand = new Command(Command.CommandType.STATS, className);
     				return retCommand;
     			}else {
-    				System.out.println("invalid command: " + unParse(input));
+    				System.out.println("error processing: " + unParse(input));
     			}
-    		}
+    		}else{
+				System.out.println("error processing: " + unParse(input));
+				return retCommand;
+			}
     	}else {
     		System.out.println("invalid command: " + unParse(input));
     	}
