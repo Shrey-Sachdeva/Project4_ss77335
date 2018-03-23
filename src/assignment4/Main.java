@@ -43,7 +43,6 @@ public class Main {
      * and the second is test (for test output, where all output to be directed to a String), or nothing.
      */
     public static void main(String[] args) { 
-    	System.out.println("This is Critters!");
         if (args.length != 0) {
             try {
                 inputFile = args[0];
@@ -118,8 +117,6 @@ public class Main {
 						Class<Critter> newCritter = (Class<Critter>) Class.forName(command.getClassName());
 						runStatsMethod = newCritter.getMethod("runStats", List.class);
 						runStatsMethod.invoke(newCritter, critterList);
-						//forName = ((Class<Critter>)Class.forName(command.getClassName())).getMethod("runStats", (List<Critter>)critterList.getClass() );
-						//forName.invoke(critterList);
 					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException | ClassNotFoundException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -135,6 +132,14 @@ public class Main {
         System.out.flush();
     }
 
+    
+    /**
+     * getCommand is the heart of the controller. This function requests user input, then processes that input
+     * and initializes a Command object with the given user input. The Command object will contain CommandType.ERROR
+     * if there was an error in the user input.
+     * @param kb : the scanner for the keyboard
+     * @return Command object with fields representing the user input
+     */
     private static Command getCommand(Scanner kb) {
     	ArrayList<String> input = parse(kb);
     	Command retCommand = new Command(Command.CommandType.ERROR);
@@ -146,14 +151,14 @@ public class Main {
     		if(input.size() == 1) {
     			retCommand = new Command(Command.CommandType.QUIT);
     		}else {
-    			System.out.println("error processing: " + unParse(input));
+    			System.out.println("invalid command: " + unParse(input));
     		}
     		return retCommand;
     	}else if(commandString.equals("show")){
     		if(input.size() == 1) {
     			retCommand = new Command(Command.CommandType.SHOW);
     		}else {
-    			System.out.println("error processing: " + unParse(input));
+    			System.out.println("invalid command: " + unParse(input));
     		}
     		return retCommand;
     	}else if(commandString.equals("step")){ // [count]
@@ -172,7 +177,7 @@ public class Main {
     			return retCommand;
     		}
     		else {
-    			System.out.println("error processing: " + unParse(input));
+    			System.out.println("invalid command: " + unParse(input));
 				return retCommand;
     		}
     	}else if(commandString.equals("seed")){ // number
@@ -199,7 +204,7 @@ public class Main {
     				return retCommand;
     			}
     			else {
-    				System.out.println("error processing: " + unParse(input));
+    				System.out.println("invalid command: " + unParse(input));
     				return retCommand;
     			}
     		}else if(input.size() == 2) {// just class name present
@@ -208,7 +213,7 @@ public class Main {
     				retCommand = new Command(Command.CommandType.MAKE, className);
     				return retCommand;
     			}else {
-    				System.out.println("error processing: " + unParse(input));
+    				System.out.println("invalid command: " + unParse(input));
     			}
     		}
     	}else if(commandString.equals("stats")) { // class name
@@ -218,11 +223,11 @@ public class Main {
     				retCommand = new Command(Command.CommandType.STATS, className);
     				return retCommand;
     			}else {
-    				System.out.println("error processing: " + unParse(input));
+    				System.out.println("invalid command: " + unParse(input));
     			}
     		}
     	}else {
-    		System.out.println("error processing: " + unParse(input));
+    		System.out.println("invalid command: " + unParse(input));
     	}
     	return retCommand;
     }
@@ -233,7 +238,6 @@ public class Main {
      * @return ArrayList<String>, ex: ["step", "20"]  or ["make", "Craig", "50"]
      */
     private static ArrayList<String> parse(Scanner kb) {
-    	System.out.println("Please input:");
         ArrayList<String> input = new ArrayList<String>();
         kb.useDelimiter("\n");
         String next = kb.next();
