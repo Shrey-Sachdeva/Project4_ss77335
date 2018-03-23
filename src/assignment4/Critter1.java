@@ -1,4 +1,26 @@
 package assignment4;
+/* CRITTERS Critter1.java
+ * EE422C Project 4 submission by
+ * Shrey Sachdeva
+ * ss77335
+ * 15455
+ * Kylar Osborne
+ * kmo785
+ * 15455
+ * Slip days used: <0>
+ * Spring 2018
+ */
+
+/**
+ * Critter1 - The Buffalo
+ * Ecological Niche: Nomadic grazing animal, forms herds with its own kind and eats algae as it traverses the world
+ * This unique Critter has the special property of only being able to move in one direction - right.
+ * At first one may consider this a boring characteristic, however any more-than-casual observer will find
+ * that from this characteristic emerges the phenomena of only traveling in groups which resemble herds.
+ * The Critter1 is a very ecologically sustainable animal. As the herd travels to the right it consumes all Algae
+ * in its path. However, the newly open space is quickly replenished over time as the herd takes its time to come
+ * back around the torus world and eat even more dense algae.
+ */
 
 public class Critter1 extends Critter {
     private int direction;

@@ -1,7 +1,17 @@
 package assignment4;
+/* CRITTERS Command.java
+ * EE422C Project 4 submission by
+ * Shrey Sachdeva
+ * ss77335
+ * 15455
+ * Kylar Osborne
+ * kmo785
+ * 15455
+ * Slip days used: <0>
+ * Spring 2018
+ */
 
 public class Command {
-
 	public static enum CommandType {
     	ERROR, QUIT, SHOW, STEP, SEED, MAKE, STATS
     }
@@ -12,9 +22,7 @@ public class Command {
 	/**
 	 * Unused constructor
 	 */
-	public Command() {
-		
-	}
+	public Command() {}
 	
 	public Command(CommandType command) {
 		this.commandType = command;

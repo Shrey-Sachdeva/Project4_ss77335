@@ -1,4 +1,28 @@
 package assignment4;
+/* CRITTERS Critter3.java
+ * EE422C Project 4 submission by
+ * Shrey Sachdeva
+ * ss77335
+ * 15455
+ * Kylar Osborne
+ * kmo785
+ * 15455
+ * Slip days used: <0>
+ * Spring 2018
+ */
+
+/**
+ * Critter3 - The Mountain Lion
+ * Ecological Niche: Solitary, territorial, this animal is an apex predator and only stays within its territory
+ * Strong, intelligent, and with the ability to amass thousands of energy, this Critter3 is the strongest critter
+ * in the entire world. The Critter3 lives its entire life traversing the perimeter of a constant size territory.
+ * At a specific point, the top right of the territory, the Critter3 will create an offspring to conquer the
+ * territory to the right and also granting the offspring a slightly larger territory box. Biologists have
+ * observed this critter in the wild to always cause Craig extinction, which average 106 energy after 100000 steps,
+ * while Critter3s average 1502 energy after 100000. The amassing of energy of Critter3s is due to its unique
+ * behavior of taking a very long time to produce children, yet the first generations produce children relatively
+ * quickly. It is the later generations that can take over 500 steps to produce a child.
+ */
 
 public class Critter3 extends Critter {
 

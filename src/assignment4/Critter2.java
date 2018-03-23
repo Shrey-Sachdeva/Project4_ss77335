@@ -1,4 +1,28 @@
 package assignment4;
+/* CRITTERS Critter2.java
+ * EE422C Project 4 submission by
+ * Shrey Sachdeva
+ * ss77335
+ * 15455
+ * Kylar Osborne
+ * kmo785
+ * 15455
+ * Slip days used: <0>
+ * Spring 2018
+ */
+
+/**
+ * Critter2 - The Fungus
+ * Ecological Niche: Quickly colonizing animal, spreads quickly in all directions.
+ * From just a glance at the simulated behavior, this Fungus like critter seems basic in that it just quickly
+ * eats Algae and spreads throughout resource rich areas. However, after years of research by elite biologists,
+ * this critter was found to possess a special talent which gives it a great advantage over other fungus-like
+ * critters. Critter2 will only reproduce and fight when it is within its first three timesteps as kept track
+ * by an age variable. The population with this young age will always be on the outer perimeter of the fungus
+ * colony, and when more inner layers reproduce and spawn overlapping babies, the energy from the inner part
+ * of the colony is transferred to the outer perimeter of the colony making it especially strong when colonizing
+ * new area.
+ */
 
 public class Critter2 extends Critter {
     private int age;

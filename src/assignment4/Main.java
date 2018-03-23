@@ -1,15 +1,14 @@
 package assignment4;
 /* CRITTERS Main.java
  * EE422C Project 4 submission by
- * Replace <...> with your actual data.
- * <Student1 Name>
- * <Student1 EID>
- * <Student1 5-digit Unique No.>
- * <Student2 Name>
- * <Student2 EID>
- * <Student2 5-digit Unique No.>
+ * Shrey Sachdeva
+ * ss77335
+ * 15455
+ * Kylar Osborne
+ * kmo785
+ * 15455
  * Slip days used: <0>
- * Fall 2016
+ * Spring 2018
  */
 
 import java.util.ArrayList;
@@ -27,16 +26,12 @@ import java.lang.reflect.Method;
  * May not use 'test' argument without specifying input file.
  */
 public class Main {
-
     static Scanner kb;	// scanner connected to keyboard input, or input file
     private static String inputFile;	// input file, used instead of keyboard input if specified
     static ByteArrayOutputStream testOutputString;	// if test specified, holds all console output
     private static String myPackage;	// package of Critter file.  Critter cannot be in default pkg.
     private static boolean DEBUG = false; // Use it or not, as you wish!
     static PrintStream old = System.out;	// if you want to restore output to console
-    
-    
-
     // Gets the package name.  The usage assumes that Critter and its subclasses are all in the same package.
     static {
         myPackage = Critter.class.getPackage().toString().split(" ")[1];
@@ -76,9 +71,6 @@ public class Main {
 
         /* Do not alter the code above for your submission. */
         /* Write your code below. */
-
-        // TODO FIX INPUT
-        //ArrayList<String> input = "";
         Critter.displayWorld();//The first call to display world initializes the myWorld arraylist[][]
         Command command;
         while( (command = getCommand(kb)).getCommandType() != Command.CommandType.QUIT) {
@@ -132,33 +124,19 @@ public class Main {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					
-        			
 				} catch (InvalidCritterException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-        		
         		break;
-        	
         	}
-        	
-        	
         }
-
         /* Write your code above */
         System.out.flush();
-
     }
 
-    /*
-     * private static enum Command {
-    	QUIT, SHOW, STEP, SEED, MAKE, STATS
-    }
-     */
     private static Command getCommand(Scanner kb) {
     	ArrayList<String> input = parse(kb);
-    	
     	Command retCommand = new Command(Command.CommandType.ERROR);
     	if(input.size() == 0) {
     		return retCommand;
