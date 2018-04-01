@@ -278,7 +278,7 @@ public class Main {
     	Class c;
 		try {
 			c = Class.forName(className);
-		} catch (ClassNotFoundException e) {
+		} catch (ClassNotFoundException | NoClassDefFoundError e1) {
 			return false;
 		}
 		return true;
